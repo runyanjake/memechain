@@ -4,22 +4,30 @@ import requests
 CAPTION_IMAGE_URL = "https://api.imgflip.com/caption_image"
 
 def load_config():
-    with open('config.json') as config_file:
+    with open('tools/config.json') as config_file:
         return json.load(config_file)   
 
-def caption_image(template_id, text0, text1):
+def caption_image(input_data):
+    # Replace single quotes with double quotes because langchain likes to use single quotes
+    input_data = input_data.replace("'", '"')
+    
+    data = json.loads(input_data)
+    template_id = data['template_id']
+    text = data['text']
+
     config = load_config()
     username = config['username']
     password = config['password']
 
-    url = "https://api.imgflip.com/caption_image"
+    url = CAPTION_IMAGE_URL
     payload = {
         "template_id": template_id,
         "username": username,
         "password": password,
-        "text0": text0,
-        "text1": text1
     }
+    
+    for i in range(len(text)):
+        payload[f'text{i}'] = text[i]
 
     response = requests.post(url, data=payload)
     result = response.json()

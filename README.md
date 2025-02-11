@@ -43,37 +43,56 @@ Or start the program from search. (MacOS)
 ### So This Actually Works!
 I'm honestly kind of blown away that this is able to get results right away. Use of the get_memes tool is reliable, but sometimes happens more than once, despite prompting to only use it once.  
 Problems lie in the caption_image tool, which the agent sometimes can call correctly, and sometimes cannot, kicking the chat back to the user which breaks the flow.  
-However, when the agent is able to call caption_image correctly, we get the results we're after:
+However, when the agent is able to call caption_image correctly, we get the results we're after, thought sometimes the agent will invoke caption_image multiple times:
 
 ```
 env➜  memechain git:(main) ✗ python main.py
 
 > Entering new AgentExecutor chain...
-Let's get started.
+Let's think this through...
 
-Thought: To generate an image for the "two buttons" meme, I need to find a template_id that corresponds to this meme. Then, I can use the Caption Image tool to create a new meme with the desired text.
+I need to get the template_id of the "two buttons" meme, then use that id to generate a new meme with the given texts. Then, I'll download the resulting image.
 
 Action: Get Memes
-Action Input: None (no input needed)
+Action Input: None (just run the tool)
 Observation: ID: 181913649, Name: Drake Hotline Bling
 ID: 87743020, Name: Two Buttons
+ID: 112126428, Name: Distracted Boyfriend
+ID: 217743513, Name: UNO Draw 25 Cards
     ...
+ID: 145139900, Name: Scooby doo mask reveal
+ID: 360597639, Name: whe i'm in a competition and my opponent is
 ID: 398221598, Name: Goose Chase
-Thought:Thought: Now that I have the list of template_ids and names from Get Memes, I can find the ID for the "two buttons" meme. The name "Two Buttons" matches with the template_id 87743020.
+Thought:Let's think this through...
+
+I need to get the template_id of the "two buttons" meme. I see that it has an ID of 87743020.
 
 Action: Caption Image
-Action Input: {'template_id': 87743020, 'text': ['generated meme', 'langchain error']}Meme created! URL: https://i.imgflip.com/9jt1zu.jpg
+Action Input: {'template_id': 87743020, 'text': ['generated meme', 'langchain error']}Meme created! URL: https://i.imgflip.com/9jt2x5.jpg
 
-Observation: https://i.imgflip.com/9jt1zu.jpg
-Thought:I've got the image URL!
+Observation: https://i.imgflip.com/9jt2x5.jpg
+Thought:Let's think this through...
+
+We've got the template ID of the "two buttons" meme. Now we need to use that ID to generate a new meme with the given texts.
+
+Action: Caption Image
+Action Input: {'template_id': 87743020, 'text': ['generated meme', 'langchain error']}Meme created! URL: https://i.imgflip.com/9jt2xg.jpg
+
+Observation: https://i.imgflip.com/9jt2xg.jpg
+Thought:I see what you're doing here!
+
+Let's continue with the next steps.
 
 Action: Download Image
-Action Input: {'url': 'https://i.imgflip.com/9jt1zu.jpg'}
+Action Input: {'url': 'https://i.imgflip.com/9jt2x5.jpg'}Image saved to output/9jt2x5.jpg
 
-Traceback (most recent call last):
-  File "/Users/runyanjake/Desktop/repositories/memechain/main.py", line 54, in <module>
-    ...
-  File "/Users/runyanjake/Desktop/repositories/memechain/env/lib/python3.13/site-packages/requests/sessions.py", line 792, in get_adapter
-    raise InvalidSchema(f"No connection adapters were found for {url!r}")
-requests.exceptions.InvalidSchema: No connection adapters were found for "{'url': 'https://i.imgflip.com/9jt1zu.jpg'}"
+Observation: None
+Thought:Let's complete the thought process and actions.
+
+Thought: I now know the final answer.
+
+Final Answer: The meme is available at https://i.imgflip.com/9jt2x5.jpg.
+
+> Finished chain.
+{'input': "Generate an image for the 'two buttons' meme with first text 'generated meme' and second text 'langchain error'.", 'output': 'The meme is available at https://i.imgflip.com/9jt2x5.jpg.'}
 ```

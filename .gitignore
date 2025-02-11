@@ -1,3 +1,4 @@
 env/
 output/
-config.json
+tools/config.json
+tools/__pycache__/

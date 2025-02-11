@@ -1,59 +1,51 @@
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_ollama.llms import OllamaLLM
+from langchain_core.tools import Tool
+from langchain.agents import AgentExecutor, AgentType, Tool, initialize_agent
+
 import requests
 import os
-import json
 
-def load_config():
-    with open('config.json') as config_file:
-        return json.load(config_file)
-    
-def get_memes():
-    url = "https://api.imgflip.com/get_memes"
-    response = requests.get(url)
-    result = response.json()
-    
-    if result['success']:
-        memes = result['data']['memes']
-        for meme in memes:
-            print(f"ID: {meme['id']}, Name: {meme['name']}")
-    else:
-        print("Failed to retrieve memes.")
+from tools.get_memes import get_memes
+from tools.caption_image import caption_image
+from tools.download_image import download_image
 
-def create_meme(template_id, text0, text1):
-    config = load_config()
-    username = config['username']
-    password = config['password']
-    
-    url = "https://api.imgflip.com/caption_image"
-    payload = {
-        "template_id": template_id,
-        "username": username,
-        "password": password,
-        "text0": text0,
-        "text1": text1
-    }
-    
-    response = requests.post(url, data=payload)
-    result = response.json()
-    
-    if result['success']:
-        meme_url = result['data']['url']
-        print(f"Meme created! URL: {meme_url}")
-        download_image(meme_url)
-    else:
-        print(f"Error: {result['error_message']}")
+system_prompt = """
+    You are an assistant that looks up the numerical template_id of a meme from imgflip.
+    The following tools are available to you:
 
-def download_image(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        output_dir = 'output'
-        os.makedirs(output_dir, exist_ok=True)
-        image_path = os.path.join(output_dir, url.split("/")[-1])
-        with open(image_path, 'wb') as f:
-            f.write(response.content)
-        print(f"Image saved to {image_path}")
-    else:
-        print("Failed to download image.")
+    1. get_memes - Does not take any agruments. Returns a list of template_ids (integer) and names (string) which are the titles of the memes that correspond to the template_id.
+    2. caption_image - Given a valid template_id, top text, and bottom text, generates an image with the desired text. Returns the url of the new meme as a string.
+    3. download_image - Given a valid url returned from the caption_image tool, downloads the image we made locally.
 
+    Use these tools if necessary to answer questions.
+"""
 
-create_meme(20007896, "Top text", "Bottom text")
-# get_memes()
+prompt_template = f"""
+    {system_prompt}
+
+    Question: {{question}}
+
+    Answer: Let's think step by step.
+"""
+
+prompt = ChatPromptTemplate.from_template(prompt_template)
+
+tools = [
+    Tool(name="Get Memes", func=get_memes, description="Does not take any agruments. Returns a list of template_ids (integer) and names (string) which are the titles of the memes that correspond to the template_id."),
+    Tool(name="Caption Image", func=caption_image, description="Given a valid template_id, top text, and bottom text, generates an image with the desired text. Returns the url of the new meme as a string."),
+    Tool(name="Download Image", func=download_image, description="Given a valid url returned from the caption_image tool, downloads the image we made locally.")
+]
+
+llm = OllamaLLM(model="llama3")
+
+agent_executor = initialize_agent(
+    tools=tools,
+    llm=llm,
+    agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
+response = agent_executor.invoke({"input": "Generate an image for the 'stick poke' meme with the top text 'come on' and the bottom text 'do something'."})
+print(response)
+

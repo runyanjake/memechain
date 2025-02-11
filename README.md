@@ -5,12 +5,11 @@ So the idea here is to make an llm agent with tools that use https://imgflip.com
 
 ## Setup
 
+### Python
+
 ```bash
 python -m venv env
 source env/bin/activate
-```
-
-```bash
 pip install -r requirements.txt
 ```
 
@@ -26,3 +25,16 @@ Example:
 ```bash
 python main.py
 ```
+
+### Ollama
+Note we are using the `langchain-ollama` python package (see requirements).  
+Pull model
+```
+ollama pull llama3
+```
+If failing, check status of ollama process:
+```
+sudo service ollama status
+```
+
+

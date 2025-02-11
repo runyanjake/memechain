@@ -13,17 +13,13 @@ from tools.download_image import download_image
 system_prompt = """
 You are an assistant that helps users create memes using the Imgflip API. 
 
-Your tasks include:
-1. Searching for the numerical template_id of a requested meme using the "Get Memes" tool.
-   - This tool should only be used once per request.
-   - If the template_id cannot be found, inform the user.
+Given a prompt from the user you must perform the following steps in order, once, before responding:
+1. Search for the numerical template_id of a requested meme using the "Get Memes" tool.
+2. Generate a meme using the "Caption Image" tool once the template_id is found. The tool input must be valid JSON with the keys: "template_id" (integer) and "text" (list of strings).
+3. Download the generated meme using the "Download Image" tool.
 
-2. Generating a meme using the "Caption Image" tool once the template_id is found.
-   - The tool input must be valid JSON with the keys: "template_id" (integer) and "text" (list of strings). Keys must be enclosed in double quotes.
-
-3. Downloading the generated meme using the "Download Image" tool if requested.
-
-Your tool invocations must match the exact string of one of the tools listed above.
+Your tool invocations must match the exact string of one of the tools listed above. Do not use any tool more than once.
+Once the Download Image tool has been used, do not use any other tools. Parse the url out of the tool's response and respond with the url.
 """
 
 prompt_template = f"""

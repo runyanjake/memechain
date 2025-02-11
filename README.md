@@ -13,7 +13,7 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
-Update config.json with your imgflip username and password.
+Update tools/config.json with your imgflip username and password.
 Example:
 ```json
 {

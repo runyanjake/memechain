@@ -37,4 +37,5 @@ def caption_image(input_data):
         print(f"Meme created! URL: {meme_url}")
         return meme_url
     else:
+        print(f"Meme could not be created. Response code: {result}")
         return None

@@ -3,6 +3,7 @@ import requests
 import json
 
 def download_image(input_data):
+    print(f"Downloading image with input data: {input_data}")
     input_data = input_data.replace("'", '"')
     
     data = json.loads(input_data)
